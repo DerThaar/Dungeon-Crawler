@@ -249,8 +249,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 534669902}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.00015289329, y: 0.86138296, z: -0.5079561, w: 0.0002593461}
+  m_LocalPosition: {x: 108.23002, y: 170.47853, z: 215.07465}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -280,13 +280,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 655574471}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6ff724d0d60a084c99b130f12e19518, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a6c6ca2c74d2ae45925b436906eef0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 230
+  visLevelColors:
+  - {r: 0.9847293, g: 1, b: 0.0047169924, a: 0}
+  - {r: 1, g: 0.5147248, b: 0.0141509175, a: 0}
+  - {r: 1, g: 0, b: 0, a: 0}
+  - {r: 1, g: 0, b: 0.6343899, a: 0}
+  - {r: 0.61105394, g: 0, b: 1, a: 0}
+  - {r: 0.053436756, g: 0, b: 1, a: 0}
+  - {r: 0, g: 0.67338705, b: 1, a: 0}
+  - {r: 0, g: 1, b: 0.8384063, a: 0}
+  - {r: 0, g: 1, b: 0.2829156, a: 0}
+  - {r: 0.9811321, g: 0.9811321, b: 0.9811321, a: 0}
+  width: 300
   height: 200
-  minNodeWidth: 45
-  minNodeHeight: 40
+  minSplitableNodeWidth: 100
+  minSplitableNodeHeight: 80
+  wallPrefab: {fileID: 1860435449373616, guid: 48cb1ea6a27ba4a4fb2686c356c4c701, type: 2}
+  floorPrefab: {fileID: 1388833810805370, guid: a0ffdaeb4ac09b846b7351b29459449c,
+    type: 2}
+  doorPrefab: {fileID: 1364605962759060, guid: 8e988000176a34d49b043e28247d1d16, type: 2}
 --- !u!4 &655574473
 Transform:
   m_ObjectHideFlags: 0

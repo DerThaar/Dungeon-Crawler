@@ -12,7 +12,7 @@ public class BSP_Node
 
 	public Rect rect;
 	public Rect room;
-	public Rect corridor;
+	public Rect corridor;	
 
 	public int Level { get; private set; }
 

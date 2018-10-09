@@ -68,7 +68,7 @@ public class BSP_Tree
 			int quantizedY = Mathf.CeilToInt((int)leafRect.y + yMargin);
 			int quantizedWidth = Mathf.FloorToInt(newWidth);
 			int quantizedHeight = Mathf.FloorToInt(newHeight);
-			leafs[i].room = new Rect(quantizedX, quantizedY, quantizedWidth, quantizedHeight);
+			leafs[i].room = new Rect(quantizedX, quantizedY, quantizedWidth, quantizedHeight);			
 		}
 	}
 
