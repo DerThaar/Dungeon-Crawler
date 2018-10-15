@@ -12,6 +12,7 @@ public class Generator : MonoBehaviour
 	public GameObject wallPrefab;
 	public GameObject floorPrefab;
 	public GameObject doorPrefab;
+	GameObject floor;
 	Dictionary<TileType, GameObject> roomTypeDict;
 
 	BSPTree bsp;
@@ -22,9 +23,6 @@ public class Generator : MonoBehaviour
 	{
 		roomTypeDict = new Dictionary<TileType, GameObject>() { { TileType.Wall, wallPrefab }, { TileType.Room, floorPrefab }, { TileType.Corridor, floorPrefab }, { TileType.Door, doorPrefab } };
 		CreateBSPTree();
-		CreateGameGrid();
-		CreateGeometry();
-		CreateGeometryFromGameGrid();
 	}
 
 	void Update()
@@ -39,72 +37,57 @@ public class Generator : MonoBehaviour
 	void CreateBSPTree()
 	{
 		bsp = new BSPTree(width, height, minSplitableNodeWidth, minSplitableNodeHeight);
-		//Debug.Log($"all nodes count: {bsp.allNodes.Count}");
 		bsp.CreateNodeLists();//TODO moeglicher refactor
-		bsp.GenerateRooms();
-		bsp.GenerateCorridors();
+		CreateGeometry();		
 		vis = true;
 	}
 
-	void CreateGameGrid()
-	{
-		grid = new GameGrid();
-		grid.Nodes = new Node[width, height];
-		for (int i = 0; i < bsp.allNodes.Count; i++)
-		{
-			if (bsp.allNodes[i].tileType == TileType.Room || bsp.allNodes[i].tileType == TileType.Corridor)
-			{
-				Rect room = bsp.allNodes[i].room;
-				grid.Nodes = SetGridTileTypesRange(grid.Nodes, bsp.allNodes[i].tileType, (int)room.xMin, (int)room.xMax, (int)room.yMin, (int)room.yMax);
-				for (int j = 0; j < bsp.allNodes[i].doors.Count; j++)
-				{
-					Vector2Int coord = bsp.allNodes[i].doors[j];
-					grid.Nodes[coord.x, coord.y].TileType = TileType.Door;
-				}
-			}
-		}
-	}
-
 	void CreateGeometry()
-	{
-		GameObject geometry = new GameObject();
-		for (int i = 0; i < bsp.allNodes.Count; i++)
+	{			
+		foreach (BSPNode node in bsp.Leafs)
 		{
-			var floorGeo = Instantiate(roomTypeDict[TileType.Room]);
-			floorGeo.transform.parent = geometry.transform;
-			Rect room = bsp.allNodes[i].room;
-			floorGeo.transform.position = new Vector3(room.center.x, 0f, room.center.y);
-			floorGeo.transform.localScale = new Vector3(room.size.x, 1f, room.size.y);
-			var wallGeo = Instantiate(roomTypeDict[TileType.Wall]);
-			wallGeo.transform.parent = geometry.transform;
-			wallGeo.transform.position = new Vector3(room.center.x, 0f, room.center.y);
-		}
-	}
+			GameObject wallParent = new GameObject();
+			wallParent.name = "WallParent";
+			Color color = Random.ColorHSV();
+			int width = Mathf.CeilToInt(node.rect.width * 0.5f);
+			int height = Mathf.CeilToInt(node.rect.height * 0.5f);
+			floor = Instantiate(floorPrefab);
+			floor.transform.position = new Vector3Int(node.rect.x + width, 0, node.rect.y + height);
+			floor.transform.localScale = new Vector3Int(node.rect.width, 1, node.rect.height);
 
-	void CreateGeometryFromGameGrid()
-	{
-		GameObject geometry = new GameObject();
-		for (int y = 0; y < grid.Nodes.GetLength(1); y++)
-		{
-			for (int x = 0; x < grid.Nodes.GetLength(0); x++)
+			for (int i = 0; i < node.rect.width; i++)
 			{
-				var go = Instantiate(roomTypeDict[grid.Nodes[x, y].TileType]);
-				go.transform.parent = geometry.transform;
-				go.transform.localPosition = new Vector3(x, 0f, y);
+				GameObject wallTile = Instantiate(wallPrefab, wallParent.transform);
+				wallTile.transform.position = new Vector3Int(node.rect.x + i, 0, node.rect.y + node.rect.height);
+				wallTile.transform.localScale = new Vector3Int(1, 5, 1); //just for testing
+				wallTile.transform.GetChild(0).GetComponent<Renderer>().material.color = color;
+			}
+			for (int i = 0; i < node.rect.height; i++)
+			{
+				GameObject wallTile = Instantiate(wallPrefab, wallParent.transform);
+				wallTile.transform.position = new Vector3Int(node.rect.x, 0, node.rect.y + node.rect.height - i);
+				wallTile.transform.localScale = new Vector3Int(1, 5, 1); //just for testing
+				wallTile.transform.GetChild(0).GetComponent<Renderer>().material.color = color;
 			}
 		}
-	}
 
-	Node[,] SetGridTileTypesRange(Node[,] nodes, TileType tileType, int xMin, int xMax, int yMin, int yMax)
-	{
-		for (int y = yMin; y < yMax; y++)
+		GameObject wallParentEnd = new GameObject();
+		wallParentEnd.name = "WallParent";
+		Color colorEnd = Random.ColorHSV();
+		for (int i = 0; i < bsp.root.rect.width; i++)
 		{
-			for (int x = xMin; x < xMax; x++)
-			{
-				nodes[x, y].TileType = tileType;
-			}
+			GameObject wallTile = Instantiate(wallPrefab, wallParentEnd.transform);
+			wallTile.transform.position = new Vector3Int(bsp.root.rect.x + i, 0, bsp.root.rect.y);
+			wallTile.transform.localScale = new Vector3Int(1, 5, 1); //just for testing
+			wallTile.transform.GetChild(0).GetComponent<Renderer>().material.color = colorEnd;
 		}
-		return nodes;
+		for (int i = 0; i < bsp.root.rect.height; i++)
+		{
+			GameObject wallTile = Instantiate(wallPrefab, wallParentEnd.transform);
+			wallTile.transform.position = new Vector3Int(bsp.root.rect.x + bsp.root.rect.width, 0, bsp.root.rect.y + i);
+			wallTile.transform.localScale = new Vector3Int(1, 5, 1); //just for testing
+			wallTile.transform.GetChild(0).GetComponent<Renderer>().material.color = colorEnd;
+		}
 	}
 
 	void OnDrawGizmos()
@@ -115,18 +98,6 @@ public class Generator : MonoBehaviour
 		foreach (BSPNode node in bsp.Leafs)
 		{
 			Gizmos.DrawWireCube(new Vector3(node.rect.x + (node.rect.width * 0.5f), 0f, node.rect.y + (node.rect.height * 0.5f)), new Vector3(node.rect.width, 0f, node.rect.height));
-		}
-
-		foreach (var node in bsp.Leafs)
-		{
-			Gizmos.DrawWireCube(new Vector3(node.room.x + (node.room.width * 0.5f), 0f, node.room.y + (node.room.height * 0.5f)), new Vector3(node.room.width, 0f, node.room.height));
-		}
-
-		Gizmos.color = Color.green;
-		foreach (BSPNode node in bsp.allNodes)
-		{
-			Gizmos.color = visLevelColors[node.Level];
-			Gizmos.DrawWireCube(new Vector3(node.room.x + (node.room.width * 0.5f), 0f, node.room.y + (node.room.height * 0.5f)), new Vector3(node.room.width, 0f, node.room.height));
 		}
 	}
 }

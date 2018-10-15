@@ -44,7 +44,7 @@ RenderSettings:
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 11
-  m_GIWorkflowMode: 0
+  m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -52,7 +52,7 @@ LightmapSettings:
     m_AlbedoBoost: 1
     m_TemporalCoherenceThreshold: 1
     m_EnvironmentLightingMode: 0
-    m_EnableBakedLightmaps: 1
+    m_EnableBakedLightmaps: 0
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
     serializedVersion: 10
@@ -89,7 +89,8 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ShowResolutionOverlay: 1
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000002, guid: 71aba4cfdcd3764408aa898ec8ae26e5,
+    type: 2}
   m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
@@ -249,8 +250,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 534669902}
-  m_LocalRotation: {x: 0.00015289329, y: 0.86138296, z: -0.5079561, w: 0.0002593461}
-  m_LocalPosition: {x: 108.23002, y: 170.47853, z: 215.07465}
+  m_LocalRotation: {x: 0.41949582, y: 0.004623457, z: -0.002134608, w: 0.907743}
+  m_LocalPosition: {x: 147.8206, y: 175.78232, z: -73.29951}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -298,7 +299,7 @@ MonoBehaviour:
   height: 200
   minSplitableNodeWidth: 100
   minSplitableNodeHeight: 80
-  wallPrefab: {fileID: 1860435449373616, guid: 48cb1ea6a27ba4a4fb2686c356c4c701, type: 2}
+  wallPrefab: {fileID: 1249664674728722, guid: 48cb1ea6a27ba4a4fb2686c356c4c701, type: 2}
   floorPrefab: {fileID: 1388833810805370, guid: a0ffdaeb4ac09b846b7351b29459449c,
     type: 2}
   doorPrefab: {fileID: 1364605962759060, guid: 8e988000176a34d49b043e28247d1d16, type: 2}

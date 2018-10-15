@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BSPTree
-{
+{	
 	public BSPNode root;
 	public List<BSPNode> allNodes = new List<BSPNode>(32);
 	List<List<BSPNode>> nodeLists = new List<List<BSPNode>>();
@@ -24,15 +24,14 @@ public class BSPTree
 		bool doSplitVertically = width >= height;
 		this.minNodeWidth = minNodeWidth;
 		this.minNodeHeight = minNodeHeight;
-		root = new BSPNode(null, new Rect(0f, 0f, width, height), doSplitVertically);
+		root = new BSPNode(null, new RectInt(0, 0, width, height), doSplitVertically);
 		Split(root);
 	}
 
 	public void Split(BSPNode node)
-	{
+	{		
 		allNodes.Add(node);
 		bool vertical = node.doSplitVertically;
-		bool doNextSplitVertical = !vertical;
 		bool bigEnough = node.doSplitVertically ? node.rect.width > minNodeWidth : node.rect.height > minNodeHeight;
 
 		if (bigEnough)
@@ -65,88 +64,20 @@ public class BSPTree
 	{
 		for (int i = 0; i < leafs.Count; i++)
 		{
-			Rect leafRect = leafs[i].rect;
+			RectInt leafRect = leafs[i].rect;
 			float newWidth = leafRect.width * Random.Range(0.6f, 0.8f);
 			float newHeight = leafRect.height * Random.Range(0.6f, 0.8f);
 			float xMargin = leafRect.width - newWidth;
 			xMargin *= Random.Range(0.2f, 0.6f);
 			float yMargin = leafRect.height - newHeight;
 			yMargin *= Random.Range(0.2f, 0.6f);
-			float quantizedX = Mathf.Ceil((int)leafRect.x + xMargin);
-			float quantizedY = Mathf.Ceil((int)leafRect.y + yMargin);
+			float quantizedX = Mathf.Ceil(leafRect.x + xMargin);
+			float quantizedY = Mathf.Ceil(leafRect.y + yMargin);
 			float quantizedWidth = Mathf.Floor(newWidth);
 			float quantizedHeight = Mathf.Floor(newHeight);
 			leafs[i].room = new Rect(quantizedX, quantizedY, quantizedWidth, quantizedHeight);
 			leafs[i].tileType = TileType.Room;
 		}
-	}
-
-	public void GenerateCorridors()
-	{
-		List<BSPNode> candidates = new List<BSPNode>(16);
-		for (int i = nodeLists.Count - 1; i > 0; i--)
-		{
-			for (int j = 0; j < nodeLists[i].Count; j++)
-			{
-				GenerateCorridor(nodeLists[i][j], candidates);
-			}
-		}
-		Debug.Log("number of corridors: " + numberOfCorridors.ToString());
-	}
-
-	void GenerateCorridor(BSPNode node, List<BSPNode> candidates)
-	{
-		BSPNode sibling = node.sibling;
-		bool isLeft = node.isResultOfVerticalSplit && node.rect.x < sibling.rect.x;
-		bool isLow = !node.isResultOfVerticalSplit && node.rect.y < sibling.rect.y;
-		if (!isLeft && !isLow) { return; }
-		candidates.Clear();
-		candidates.Add(node);
-		node.FillListWithChildren(candidates);
-		BSPNode bestNode = isLeft ? FindFarthestNode(Farthest.Right, candidates) : FindFarthestNode(Farthest.Top, candidates);
-		candidates.Clear();
-		candidates.Add(sibling);
-		sibling.FillListWithChildren(candidates);
-		List<BSPNode> overlapping = FindOverlapping(bestNode, candidates, !isLeft);
-		if (overlapping.Count == 0) { return; }
-		BSPNode bestSibling = isLeft ? FindFarthestNode(Farthest.Left, overlapping) : FindFarthestNode(Farthest.Bottom, overlapping);
-		int x, y, width, height;
-		Vector2Int corriDoor1, corriDoor2, bestNodeDoor, bestSiblingDoor;
-
-		if (isLeft)
-		{
-			x = (int)bestNode.room.xMax;
-			y = (int)(Mathf.Max(bestNode.room.y, bestSibling.room.y) + halfOverlap(bestNode.room, bestSibling.room, false)) - 1;
-			width = (int)bestSibling.room.x - x;
-			height = 3;
-			corriDoor1 = new Vector2Int(x, y + 1);
-			corriDoor2 = new Vector2Int(x + width - 1, y + 1);
-			bestNodeDoor = corriDoor1 + Vector2Int.left;
-			bestSiblingDoor = corriDoor2 + Vector2Int.right;
-		}
-		else
-		{
-			x = (int)(Mathf.Max(bestNode.room.x, bestSibling.room.x) + halfOverlap(bestNode.room, bestSibling.room, true)) - 1; ;
-			y = (int)bestNode.room.yMax;
-			width = 3;
-			height = (int)bestSibling.room.y - y;
-			corriDoor1 = new Vector2Int(x + 1, y);
-			corriDoor2 = new Vector2Int(x + 1, y + height - 1);
-			bestNodeDoor = corriDoor1 + Vector2Int.up;
-			bestSiblingDoor = corriDoor2 + Vector2Int.down;
-		}
-		SetDoors(node.parent, corriDoor1, corriDoor2);
-		bestNode.doors.Add(bestNodeDoor);
-		bestSibling.doors.Add(bestSiblingDoor);
-		numberOfCorridors++;
-		node.parent.room = new Rect(x, y, width, height);
-		node.parent.tileType = TileType.Corridor;
-	}
-
-	void SetDoors(BSPNode node, Vector2Int door1, Vector2Int door2)
-	{
-		node.doors.Add(door1);
-		node.doors.Add(door2);
 	}
 
 	BSPNode FindFarthestNode(Farthest farthest, List<BSPNode> candidates)
